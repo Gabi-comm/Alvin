@@ -1,9 +1,10 @@
 import os
+from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import firebase_admin
 from firebase_admin import credentials, firestore
-import networkx as nx  # <-- Added NetworkX
+import networkx as nx
 
 app = FastAPI(
     title="ALVIN Backend Engine",
@@ -12,7 +13,7 @@ app = FastAPI(
 )
 
 # Initialize Firebase
-CREDENTIALS_PATH = "alvin-661c5-firebase-adminsdk-fbsvc-5e793bd452.json"
+CREDENTIALS_PATH = "alvin-661c5-firebase-adminsdk-fbsvc-6838c1e821.json"
 if not os.path.exists(CREDENTIALS_PATH):
     raise FileNotFoundError(f"Critical Error: '{CREDENTIALS_PATH}' not found.")
 
@@ -46,6 +47,16 @@ class Edge(BaseModel):
     distance: float  # distance in meters
     is_covered: bool # true if it has a roof
     status: str = "open" # "open", "blocked_by_fire", "blocked_by_flood"
+
+class SensorReading(BaseModel):
+    sensor_id: str           # e.g., "esp32_001"
+    node_id: str             # e.g., "node_001" - Crucial for linking data to the map!
+    temperature: float       # Temperature in Celsius
+    humidity: float          # Humidity percentage (0-100)
+    air_quality: float       # Air Quality Index (AQI)
+    
+    # Automatically stamps the exact time the reading hits the server if the ESP32 doesn't provide one
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # --- ENDPOINTS ---
 
@@ -189,3 +200,57 @@ def update_path_status(edge_id: str, update: EdgeStatusUpdate):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+# --- NEW: SENSOR DATA & INTELLIGENCE ---
+def calculate_comfort_score(temp: float, humidity: float, aqi: float) -> float:
+    """
+    Core Logic: Calculates an Environmental Comfort Score (0-100) 
+    based on absolute deviations from ideal indoor conditions.
+    """
+    ideal_temp = 24.0
+    ideal_humidity = 50.0
+    
+    # Weights: 3 pts lost per degree, 0.5 pts per % humidity, 0.2 pts per AQI over 50
+    temp_penalty = abs(temp - ideal_temp) * 3.0
+    humidity_penalty = abs(humidity - ideal_humidity) * 0.5
+    aqi_penalty = max(0, aqi - 50) * 0.2
+    
+    # Calculate final score and clamp it strictly between 0 and 100
+    raw_score = 100.0 - temp_penalty - humidity_penalty - aqi_penalty
+    return max(0.0, min(100.0, round(raw_score, 1)))
+
+
+@app.post("/api/sensors/ingest", tags=["Sensor Data & Intelligence"])
+def ingest_sensor_data(reading: SensorReading):
+    """
+    Receives live environmental data from ESP32 microcontrollers.
+    Calculates the comfort score and triggers an automatic map update.
+    """
+    try:
+        data = reading.model_dump()
+        unique_doc_id = f"{reading.sensor_id}_{int(reading.timestamp.timestamp())}"
+        
+        # 1. Save the raw time-series data
+        db.collection("sensor_data").document(unique_doc_id).set(data)
+        
+        # 2. CORE LOGIC: Calculate the new comfort score
+        new_comfort_score = calculate_comfort_score(
+            reading.temperature, 
+            reading.humidity, 
+            reading.air_quality
+        )
+        
+        # 3. DYNAMIC MAP UPDATE: Update the physical node on the map
+        # We use merge=True so we don't accidentally overwrite the node's coordinates/name!
+        db.collection("nodes").document(reading.node_id).set(
+            {"comfort_score": new_comfort_score}, 
+            merge=True
+        )
+        
+        return {
+            "status": "success",
+            "message": f"🌡️ Data processed. Node {reading.node_id} comfort score updated to {new_comfort_score}/100",
+            "recorded_at": reading.timestamp
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error during ingestion: {str(e)}")
