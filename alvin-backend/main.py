@@ -12,7 +12,7 @@ app = FastAPI(
 )
 
 # Initialize Firebase
-CREDENTIALS_PATH = "alvin-661c5-firebase-adminsdk-fbsvc-a5d7a7f43c.json"
+CREDENTIALS_PATH = "alvin-661c5-firebase-adminsdk-fbsvc-5e793bd452.json"
 if not os.path.exists(CREDENTIALS_PATH):
     raise FileNotFoundError(f"Critical Error: '{CREDENTIALS_PATH}' not found.")
 
