@@ -7,6 +7,7 @@ import {
   comfortColor,
 } from '../data/mockData'
 import { fetchRoute } from '../services/api'
+import { useEmergency } from '../context/EmergencyContext'
 import Icon from './Icon'
 import './BottomPanel.css'
 
@@ -75,23 +76,37 @@ function BestRouteCard() {
 }
 
 function EmergencyCard() {
+  const { active, evac } = useEmergency()
   const e = EMERGENCY_STATUS
+  const headline = active ? 'Evacuation In Progress' : e.headline
+  const subtext = active ? `Proceed to ${evac.name}` : e.subtext
+
   return (
-    <article className={`card${e.active ? ' card--danger' : ''}`}>
+    <article className={`card${active ? ' card--danger' : ''}`}>
       <span className="card__label">EMERGENCY STATUS</span>
       <div className="emergency__headline">
-        <span className={`emergency__badge${e.active ? ' emergency__badge--active' : ''}`}>
-          <Icon name={e.active ? 'alert' : 'check'} size={20} />
+        <span className={`emergency__badge${active ? ' emergency__badge--active' : ''}`}>
+          <Icon name={active ? 'alert' : 'check'} size={20} />
         </span>
         <div>
-          <span className="emergency__title">{e.headline}</span>
-          <span className="emergency__sub">{e.subtext}</span>
+          <span className="emergency__title">{headline}</span>
+          <span className="emergency__sub">{subtext}</span>
         </div>
       </div>
       <dl className="emergency__rows">
-        <div><dt>Safe route</dt><dd>{e.safeRoute}</dd></div>
-        <div><dt>Nearest exit</dt><dd>{e.nearestExit}</dd></div>
-        <div><dt>Assembly area</dt><dd>{e.assemblyArea}</dd></div>
+        {active ? (
+          <>
+            <div><dt>Destination</dt><dd>{evac.name}</dd></div>
+            <div><dt>Type</dt><dd>{evac.partner}</dd></div>
+            <div><dt>Address</dt><dd>{evac.address}</dd></div>
+          </>
+        ) : (
+          <>
+            <div><dt>Safe route</dt><dd>{e.safeRoute}</dd></div>
+            <div><dt>Nearest exit</dt><dd>{e.nearestExit}</dd></div>
+            <div><dt>Assembly area</dt><dd>{e.assemblyArea}</dd></div>
+          </>
+        )}
       </dl>
     </article>
   )

@@ -9,28 +9,22 @@
   flex-shrink: 0;
 }
 
-.topbar__selectors {
+.topbar__context {
   display: flex;
-  gap: 10px;
-}
-
-.topbar__select select {
-  appearance: none;
-  padding: 8px 30px 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--alvin-text);
-  background: var(--alvin-surface-2)
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238ca0bd' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>")
-    no-repeat right 10px center;
-  border: 1px solid var(--alvin-border);
-  cursor: pointer;
 }
 
-.topbar__select select:focus {
-  outline: none;
-  border-color: var(--alvin-accent-2);
+.topbar__sep {
+  color: var(--alvin-text-dim);
+}
+
+.topbar__floor {
+  color: var(--alvin-text-dim);
+  font-weight: 500;
 }
 
 .topbar__right {
@@ -38,6 +32,31 @@
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.topbar__emergency {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--alvin-danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.topbar__emergency:hover {
+  filter: brightness(1.08);
+}
+
+.topbar__emergency--active {
+  background: transparent;
+  border-color: var(--alvin-danger);
+  color: var(--alvin-danger);
 }
 
 .topbar__date {

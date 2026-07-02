@@ -37,59 +37,101 @@
 }
 
 /* Comfort legend */
-.mapview__legend {
+.mapview__time-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Emergency evacuation banner */
+.mapview__evac {
   position: absolute;
   top: 14px;
   left: 14px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 12px 14px;
-  min-width: 160px;
-  background: rgba(18, 26, 43, 0.92);
-  border: 1px solid var(--alvin-border);
+  gap: 4px;
+  width: 260px;
+  padding: 14px 16px;
+  background: rgba(30, 12, 16, 0.92);
+  border: 1px solid var(--alvin-danger);
   border-radius: 12px;
   backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 4px rgba(242, 85, 95, 0.12);
 }
 
-.mapview__legend-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--alvin-text-dim);
-  margin-bottom: 2px;
-}
-
-.mapview__legend-row {
+.mapview__evac-head {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--alvin-danger);
+}
+
+.mapview__evac-name {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--alvin-text);
 }
 
-.mapview__legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.mapview__legend-loc {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid var(--alvin-border);
+.mapview__evac-sub {
   font-size: 11px;
-  color: var(--alvin-accent-2);
+  color: var(--alvin-text-dim);
 }
 
-.mapview__time-icon {
-  display: inline-flex;
+.mapview__evac-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--alvin-text);
+}
+
+.mapview__evac-go {
+  margin-top: 8px;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--alvin-danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mapview__evac-go:hover {
+  filter: brightness(1.08);
+}
+
+/* Evacuation-center marker */
+.evac-marker {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 4px;
+}
+
+.evac-marker__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--alvin-danger);
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.evac-marker__pin {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--alvin-danger);
+  box-shadow: 0 0 0 6px rgba(242, 85, 95, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Live clock */

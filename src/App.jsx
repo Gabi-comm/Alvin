@@ -8,11 +8,13 @@ import Emergency from './pages/Emergency'
 import Devices from './pages/Devices'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
+import { EmergencyProvider } from './context/EmergencyContext'
 import './App.css'
 
 export default function App() {
   return (
     <BrowserRouter>
+      <EmergencyProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<MapOverview />} />
@@ -25,6 +27,7 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
+      </EmergencyProvider>
     </BrowserRouter>
   )
 }

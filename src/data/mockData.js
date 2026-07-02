@@ -6,6 +6,20 @@
 // so the OpenStreetMap view has spatial context for each smart space.
 export const BUILDING_CENTER = [14.5995, 120.9842]
 
+// The ALVIN building location on the BGC map. MapLibre order: [lng, lat].
+export const USER_LOCATION = {
+  name: 'Main Building',
+  coords: [121.0489, 14.5509],
+}
+
+// Partner evacuation center the user is routed to during an emergency.
+export const EVAC_CENTER = {
+  name: 'SM Aura Premier',
+  partner: 'Partner Evacuation Center',
+  address: 'McKinley Pkwy, BGC, Taguig',
+  coords: [121.0563, 14.5472],
+}
+
 export const BUILDINGS = ['Main Building', 'Annex Building', 'Science Hall']
 export const FLOORS = ['Ground Floor', '2nd Floor', '3rd Floor']
 
