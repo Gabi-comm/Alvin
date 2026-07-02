@@ -18,15 +18,10 @@
 }
 
 .sidebar__logo {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  font-weight: 700;
-  font-size: 18px;
-  color: #04140f;
-  background: linear-gradient(135deg, var(--alvin-accent), var(--alvin-accent-2));
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .sidebar__title {

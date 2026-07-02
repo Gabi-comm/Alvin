@@ -1,21 +1,21 @@
 :root {
-  /* Clean light theme */
-  --alvin-bg: #eef1f7;
-  --alvin-surface: #ffffff;
-  --alvin-surface-2: #f2f5fa;
-  --alvin-border: #e4e8f0;
-  --alvin-text: #1f2a3d;
-  --alvin-text-dim: #6b7688;
-  --alvin-accent: #14b88a;
-  --alvin-accent-2: #3b82f6;
-  --alvin-active-bg: #e8f0ff;
-  --alvin-active-text: #2563eb;
-  --alvin-warn: #f59e0b;
-  --alvin-danger: #ef4444;
-  --alvin-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.05);
+  /* Balanced dark theme, keyed to the ALVIN logo (royal blue → teal/cyan) */
+  --alvin-bg: #0a1120;
+  --alvin-surface: #111b2e;
+  --alvin-surface-2: #19273f;
+  --alvin-border: #24344f;
+  --alvin-text: #e8eef8;
+  --alvin-text-dim: #899fbd;
+  --alvin-accent: #2dd4bf;
+  --alvin-accent-2: #4f8ef7;
+  --alvin-active-bg: rgba(79, 142, 247, 0.16);
+  --alvin-active-text: #8fb8ff;
+  --alvin-warn: #f5b544;
+  --alvin-danger: #f2555f;
+  --alvin-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.28);
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
   color: var(--alvin-text);
   background-color: var(--alvin-bg);
 }

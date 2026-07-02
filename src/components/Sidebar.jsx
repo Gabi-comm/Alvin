@@ -58,7 +58,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <span className="sidebar__logo" aria-hidden="true">A</span>
+        <img className="sidebar__logo" src="/alvin-logo.png" alt="ALVIN logo" />
         <div className="sidebar__title">
           <span className="sidebar__name">ALVIN</span>
           <span className="sidebar__tagline">Adaptive Living Virtual Intelligence Network</span>
