@@ -1,4 +1,4 @@
-# Malita bois - Adaptive Living Virtual Intelligence Network (ALVIN)
+# Malita Bois - Adaptive Living Virtual Intelligence Network (ALVIN)
 
 > **Note:** This project was developed for **SparkFest 2026**.
 
