@@ -14,6 +14,7 @@
   background: var(--alvin-surface);
   border: 1px solid var(--alvin-border);
   border-radius: 12px;
+  box-shadow: var(--alvin-shadow);
 }
 
 .card--danger {

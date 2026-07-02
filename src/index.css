@@ -1,17 +1,21 @@
 :root {
-  --alvin-bg: #0b1220;
-  --alvin-surface: #121a2b;
-  --alvin-surface-2: #1a2438;
-  --alvin-border: #233149;
-  --alvin-text: #e6edf7;
-  --alvin-text-dim: #8ca0bd;
-  --alvin-accent: #21d0a3;
-  --alvin-accent-2: #38bdf8;
-  --alvin-warn: #fbbf24;
-  --alvin-danger: #f5555d;
+  /* Clean light theme */
+  --alvin-bg: #eef1f7;
+  --alvin-surface: #ffffff;
+  --alvin-surface-2: #f2f5fa;
+  --alvin-border: #e4e8f0;
+  --alvin-text: #1f2a3d;
+  --alvin-text-dim: #6b7688;
+  --alvin-accent: #14b88a;
+  --alvin-accent-2: #3b82f6;
+  --alvin-active-bg: #e8f0ff;
+  --alvin-active-text: #2563eb;
+  --alvin-warn: #f59e0b;
+  --alvin-danger: #ef4444;
+  --alvin-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.05);
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--alvin-text);
   background-color: var(--alvin-bg);
 }

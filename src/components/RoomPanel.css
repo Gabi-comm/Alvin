@@ -1,0 +1,151 @@
+.room-panel {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  background: var(--alvin-surface);
+  border: 1px solid var(--alvin-border);
+  border-radius: 14px;
+  box-shadow: var(--alvin-shadow);
+  overflow-y: auto;
+}
+
+.room-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.room-panel__wing {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--alvin-accent-2);
+}
+
+.room-panel__name {
+  margin: 3px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.room-panel__room {
+  font-size: 12px;
+  color: var(--alvin-text-dim);
+}
+
+.room-panel__close {
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--alvin-text-dim);
+  cursor: pointer;
+}
+
+.room-panel__close:hover {
+  color: var(--alvin-text);
+}
+
+/* Gauge */
+.gauge {
+  position: relative;
+  align-self: center;
+  width: 128px;
+  height: 128px;
+}
+
+.gauge__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+.gauge__value {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.gauge__unit {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--alvin-text-dim);
+}
+
+.gauge__caption {
+  font-size: 10px;
+  color: var(--alvin-text-dim);
+}
+
+.gauge__band {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Metrics */
+.room-panel__metrics {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-panel__metric {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 9px 0;
+  color: var(--alvin-text-dim);
+  border-bottom: 1px solid var(--alvin-border);
+}
+
+.room-panel__metric-value {
+  font-weight: 600;
+  color: var(--alvin-text);
+}
+
+/* Devices */
+.room-panel__devices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.room-panel__devices-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--alvin-text);
+}
+
+.room-panel__active {
+  color: var(--alvin-accent-2);
+}
+
+.room-panel__device {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--alvin-text-dim);
+}
+
+.room-panel__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.room-panel__status--online {
+  color: var(--alvin-accent);
+}
+
+.room-panel__status--offline {
+  color: var(--alvin-danger);
+}

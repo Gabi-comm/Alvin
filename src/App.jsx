@@ -6,6 +6,8 @@ import Environmental from './pages/Environmental'
 import Recommendations from './pages/Recommendations'
 import Emergency from './pages/Emergency'
 import Devices from './pages/Devices'
+import Analytics from './pages/Analytics'
+import Settings from './pages/Settings'
 import './App.css'
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
           <Route path="recommendations" element={<Recommendations />} />
           <Route path="emergency" element={<Emergency />} />
           <Route path="devices" element={<Devices />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

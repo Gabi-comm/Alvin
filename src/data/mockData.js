@@ -25,16 +25,30 @@ export function comfortColor(score) {
 
 // Rooms with comfort scores, sensor readings, and coordinates.
 export const ROOMS = [
-  { id: 'lecture-1', name: 'Lecture Room 1', score: 75, lat: 14.6002, lng: 120.9852, temp: 26, humidity: 60, airflow: 0.4, occupancy: 18 },
-  { id: 'library', name: 'Library', score: 95, lat: 14.5998, lng: 120.9838, temp: 24, humidity: 52, airflow: 0.6, occupancy: 24 },
-  { id: 'study-1', name: 'Study Area 1', score: 92, lat: 14.5993, lng: 120.9833, temp: 24, humidity: 54, airflow: 0.5, occupancy: 12 },
-  { id: 'admin', name: 'Admin Office', score: 70, lat: 14.5991, lng: 120.9841, temp: 27, humidity: 58, airflow: 0.3, occupancy: 6 },
-  { id: 'hallway', name: 'Hallway', score: 58, lat: 14.5995, lng: 120.9845, temp: 29, humidity: 66, airflow: 0.7, occupancy: 9 },
-  { id: 'lounge', name: 'Lounge', score: 82, lat: 14.6000, lng: 120.9858, temp: 25, humidity: 55, airflow: 0.5, occupancy: 14 },
-  { id: 'cafeteria', name: 'Cafeteria', score: 64, lat: 14.5989, lng: 120.9853, temp: 28, humidity: 63, airflow: 0.4, occupancy: 31 },
-  { id: 'entrance', name: 'Entrance Lobby', score: 50, lat: 14.5990, lng: 120.9848, temp: 30, humidity: 68, airflow: 0.8, occupancy: 20 },
-  { id: 'storage', name: 'Storage', score: 40, lat: 14.5987, lng: 120.9836, temp: 31, humidity: 70, airflow: 0.2, occupancy: 1 },
+  { id: 'lecture-1', name: 'Lecture Room 1', wing: 'Academic Wing', room: 'Room 201', score: 75, lat: 14.6002, lng: 120.9852, temp: 25.8, humidity: 60, airflow: 0.4, noise: 40, occupancy: 18, capacity: 40 },
+  { id: 'library', name: 'Library', wing: 'Library Wing', room: 'Room 101', score: 95, lat: 14.5998, lng: 120.9838, temp: 24.3, humidity: 58, airflow: 0.6, noise: 32, occupancy: 23, capacity: 60 },
+  { id: 'study-1', name: 'Study Area 1', wing: 'Library Wing', room: 'Room 102', score: 92, lat: 14.5993, lng: 120.9833, temp: 24.1, humidity: 54, airflow: 0.5, noise: 35, occupancy: 12, capacity: 30 },
+  { id: 'admin', name: 'Admin Office', wing: 'Admin Wing', room: 'Room 010', score: 70, lat: 14.5991, lng: 120.9841, temp: 26.9, humidity: 58, airflow: 0.3, noise: 45, occupancy: 6, capacity: 15 },
+  { id: 'hallway', name: 'Hallway', wing: 'Main Building', room: 'Corridor A', score: 58, lat: 14.5995, lng: 120.9845, temp: 28.6, humidity: 66, airflow: 0.7, noise: 55, occupancy: 9, capacity: 40 },
+  { id: 'lounge', name: 'Lounge', wing: 'Student Wing', room: 'Room 120', score: 82, lat: 14.6000, lng: 120.9858, temp: 25.2, humidity: 55, airflow: 0.5, noise: 48, occupancy: 14, capacity: 25 },
+  { id: 'cafeteria', name: 'Cafeteria', wing: 'Student Wing', room: 'Room 130', score: 64, lat: 14.5989, lng: 120.9853, temp: 27.8, humidity: 63, airflow: 0.4, noise: 62, occupancy: 31, capacity: 80 },
+  { id: 'entrance', name: 'Entrance Lobby', wing: 'Main Building', room: 'Ground', score: 50, lat: 14.5990, lng: 120.9848, temp: 29.7, humidity: 68, airflow: 0.8, noise: 58, occupancy: 20, capacity: 50 },
+  { id: 'storage', name: 'Storage', wing: 'Service Wing', room: 'Room 005', score: 40, lat: 14.5987, lng: 120.9836, temp: 31.1, humidity: 70, airflow: 0.2, noise: 30, occupancy: 1, capacity: 5 },
 ]
+
+// Qualitative label for an airflow reading (m/s).
+export function airflowLabel(v) {
+  if (v >= 0.6) return 'Good'
+  if (v >= 0.4) return 'Moderate'
+  return 'Low'
+}
+
+// Qualitative label for a noise reading (dB).
+export function noiseLabel(db) {
+  if (db <= 40) return `Low (${db} dB)`
+  if (db <= 55) return `Moderate (${db} dB)`
+  return `High (${db} dB)`
+}
 
 // IoT sensor nodes (ESP32) deployed around the building.
 export const DEVICES = [
@@ -57,14 +71,14 @@ export const EMERGENCY_SCENARIOS = [
 
 export const OUTDOOR_WEATHER = {
   city: 'Manila City',
-  temperature: 25,
-  condition: 'Rain detected',
-  humidity: 94,
-  rainIntensity: '0.1 mm/h',
-  wind: '10 km/h',
-  heatIndex: '30 C',
+  temperature: 26,
+  condition: 'Cloudy',
+  humidity: 93,
+  rainIntensity: '0.0 mm/h',
+  wind: '7 km/h',
+  heatIndex: '31 C',
   source: 'Live Open-Meteo',
-  updatedAt: '4:45 AM',
+  updatedAt: '5:45 AM',
 }
 
 export const RECOMMENDATIONS = [
