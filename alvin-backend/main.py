@@ -1,4 +1,5 @@
 import os
+import requests
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -221,6 +222,94 @@ def calculate_comfort_score(temp: float, humidity: float, aqi: float) -> float:
 
 
 @app.post("/api/sensors/ingest", tags=["Sensor Data & Intelligence"])
+def get_sta_mesa_weather():
+
+    """
+    Utility Function: Fetches real-time weather data for Sta. Mesa, Manila.
+    Requires a free API key from openweathermap.org. 
+    """
+    API_KEY = "75fb14edf2704573b25f21703b0c5cfa"  
+    CITY = "Manila,PH"
+    # We ask for metric units so the temperature comes back in Celsius
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+    try:
+
+        response = requests.get(url, timeout=5)
+
+        response.raise_for_status()  # Fails safely if the API is down
+
+        data = response.json()
+
+        
+
+        # Extract exactly what the ALVIN brain needs
+
+        current_temp = data["main"]["temp"]
+
+        heat_index = data["main"]["feels_like"] # The "real feel"
+
+        weather_condition = data["weather"][0]["main"] # e.g., "Rain", "Clouds", "Clear"
+
+        
+
+        is_raining = weather_condition.lower() == "rain" or weather_condition.lower() == "drizzle"
+
+        
+
+        return {
+
+            "status": "success",
+
+            "location": "Sta. Mesa, Manila",
+
+            "temperature_c": current_temp,
+
+            "heat_index_c": heat_index,
+
+            "condition": weather_condition,
+
+            "is_raining": is_raining
+
+        }
+
+        
+
+    except requests.exceptions.RequestException as e:
+
+        # Fallback data if the API key is missing or the internet is down
+
+        return {
+
+            "status": "error",
+
+            "message": "Weather API offline or missing key. Returning fallback data.",
+
+            "location": "Sta. Mesa, Manila",
+
+            "temperature_c": 31.0,
+
+            "heat_index_c": 34.0,
+
+            "condition": "Unknown",
+
+            "is_raining": False
+
+        }
+
+
+@app.get("/api/weather/current", tags=["Sensor Data & Intelligence"])
+
+def fetch_current_weather():
+
+    """
+
+    Dashboard Endpoint: Returns current outdoor conditions in Sta. Mesa.
+
+    Used by the frontend to display weather warnings.
+
+    """
+
+    return get_sta_mesa_weather()
 def ingest_sensor_data(reading: SensorReading):
     """
     Receives live environmental data from ESP32 microcontrollers.
@@ -254,3 +343,69 @@ def ingest_sensor_data(reading: SensorReading):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error during ingestion: {str(e)}")
+    
+@app.get("/api/dashboard/live-sensors", tags=["Sensor Data & Intelligence"])
+def get_live_sensor_readings():
+    """
+    Dashboard Endpoint: Retrieves the most recent environmental readings 
+    for all active nodes to display live metrics on the UI.
+    """
+    try:
+        # Fetch all nodes from Firestore to see their current states
+        nodes_ref = db.collection("nodes").stream()
+        live_metrics = []
+        
+        for doc in nodes_ref:
+            node_data = doc.to_dict()
+            live_metrics.append({
+                "node_id": node_data.get("id"),
+                "name": node_data.get("name"),
+                "comfort_score": node_data.get("comfort_score", 100.0),
+                "type": node_data.get("type")
+            })
+            
+        return {
+            "status": "success",
+            "total_monitored_nodes": len(live_metrics),
+            "nodes": live_metrics
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch live stats: {str(e)}")
+
+
+@app.get("/api/dashboard/stats", tags=["Sensor Data & Intelligence"])
+def get_dashboard_summary_stats():
+    """
+    Dashboard Endpoint: Calculates overall infrastructure intelligence statistics 
+    (e.g., system-wide average comfort level, alert statuses).
+    """
+    try:
+        nodes_ref = db.collection("nodes").stream()
+        
+        scores = []
+        low_comfort_alerts = []
+        
+        for doc in nodes_ref:
+            node_data = doc.to_dict()
+            score = node_data.get("comfort_score", 100.0)
+            scores.append(score)
+            
+            # If a room's comfort score falls below 70, flag it as an alert area
+            if score < 70.0:
+                low_comfort_alerts.append({
+                    "node_id": node_data.get("id"),
+                    "name": node_data.get("name"),
+                    "current_score": score
+                })
+        
+        # Calculate system-wide average indoor comfort
+        avg_comfort = round(sum(scores) / len(scores), 1) if scores else 100.0
+        
+        return {
+            "status": "success",
+            "system_wide_average_comfort": avg_comfort,
+            "total_alerts": len(low_comfort_alerts),
+            "alert_areas": low_comfort_alerts
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to compile dashboard metrics: {str(e)}")
