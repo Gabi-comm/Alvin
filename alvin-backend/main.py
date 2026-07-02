@@ -1,6 +1,10 @@
 import os
 import requests
 from datetime import datetime, timezone
+from dotenv import load_dotenv
+
+load_dotenv()  # read config from a local .env file if present
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
