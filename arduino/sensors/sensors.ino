@@ -13,7 +13,6 @@ WIRINGS:
 #define DHTPIN 12
 #define DHTTYPE DHT22
 #define MQ2PIN 4
-#define PWRPIN 32 //supplies the 3V3 to the sensors
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -29,9 +28,6 @@ void setup() {
   Serial.begin(115200);
   delay(500);
 
-  pinMode(PWRPIN, OUTPUT);
-  digitalWrite(PWRPIN, HIGH);
-  delay(200);
 
 dht.begin();
   pinMode(MQ2PIN, INPUT);
@@ -61,6 +57,7 @@ void readSensors() {
   float tempC = dht.readTemperature();
   int gasRaw = analogRead(MQ2PIN);
 
+  //convert raw ADC to the voltage (3.3V reference, 12-bit ADC)
     float gasVoltage = gasRaw * (3.3 / 4095.0);
 
     Serial.println("----------------------------------");
