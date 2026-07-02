@@ -155,12 +155,18 @@ Drop `.glb` files into `public/models/`:
 | POST   | `/api/nodes`                      | Create/update a map node             |
 | POST   | `/api/edges`                      | Create/update a walkable path        |
 | GET    | `/api/navigate`                   | Shortest / covered / comfortable route |
+| GET    | `/api/rooms`                      | Full detail for all rooms            |
+| GET    | `/api/recommendations`            | Best space per activity + ranked list |
+| GET    | `/api/devices`                    | IoT devices + health summary         |
 | POST   | `/api/emergency/global`           | Set global emergency mode            |
+| GET    | `/api/emergency/status`           | Current emergency state              |
 | PUT    | `/api/emergency/edges/{edge_id}`  | Block/open a pathway                 |
+| GET    | `/api/evacuation-centers`         | Partner evacuation centers           |
+| GET    | `/api/evacuation-centers/nearest` | Nearest center to a point            |
 | POST   | `/api/sensors/ingest`             | Ingest an ESP32 sensor reading       |
 | GET    | `/api/weather/current`            | Current outdoor conditions           |
 | GET    | `/api/dashboard/live-sensors`     | Per-node comfort scores              |
-| GET    | `/api/dashboard/stats`            | System-wide comfort + alerts         |
+| GET    | `/api/dashboard/stats`            | Building-wide comfort, occupancy, devices, alerts |
 
 ---
 
