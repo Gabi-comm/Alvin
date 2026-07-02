@@ -1,4 +1,5 @@
 import { EMERGENCY_SCENARIOS, EMERGENCY_STATUS } from '../data/mockData'
+import Icon from '../components/Icon'
 import './pages.css'
 
 export default function Emergency() {
@@ -15,7 +16,7 @@ export default function Emergency() {
       <div className="panel" style={{ marginBottom: 20 }}>
         <div className="emergency__headline">
           <span className={`emergency__badge${e.active ? ' emergency__badge--active' : ''}`}>
-            {e.active ? '⚠' : '✓'}
+            <Icon name={e.active ? 'alert' : 'check'} size={20} />
           </span>
           <div>
             <span className="emergency__title">{e.headline}</span>
@@ -34,8 +35,8 @@ export default function Emergency() {
         {EMERGENCY_SCENARIOS.map((s) => (
           <div key={s.id} className="info-card">
             <div className="info-card__head">
-              <span className="info-card__name">
-                <span style={{ marginRight: 8 }}>{s.icon}</span>{s.name}
+              <span className="info-card__name info-card__name--icon">
+                <Icon name={s.icon} size={18} />{s.name}
               </span>
             </div>
             <div style={{ fontSize: 13, color: 'var(--alvin-text-dim)' }}>{s.response}</div>

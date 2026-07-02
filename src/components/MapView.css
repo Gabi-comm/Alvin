@@ -77,11 +77,19 @@
 }
 
 .mapview__legend-loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 4px;
   padding-top: 8px;
   border-top: 1px solid var(--alvin-border);
   font-size: 11px;
   color: var(--alvin-accent-2);
+}
+
+.mapview__time-icon {
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Time slider */

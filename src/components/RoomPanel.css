@@ -37,9 +37,10 @@
 }
 
 .room-panel__close {
+  display: inline-flex;
   border: none;
   background: none;
-  font-size: 22px;
+  padding: 2px;
   line-height: 1;
   color: var(--alvin-text-dim);
   cursor: pointer;

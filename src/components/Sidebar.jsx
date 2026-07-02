@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { OUTDOOR_WEATHER } from '../data/mockData'
 import { fetchWeather } from '../services/api'
+import Icon, { weatherIcon } from './Icon'
 import './Sidebar.css'
 
 // Minimal line icons (stroke uses currentColor so they follow link state).
@@ -85,7 +86,9 @@ export default function Sidebar() {
         <span className="sidebar__city">{w.city}</span>
 
         <div className="sidebar__temp-row">
-          <span className="sidebar__weather-icon" aria-hidden="true">🌧️</span>
+          <span className="sidebar__weather-icon" aria-hidden="true">
+            <Icon name={weatherIcon(w.condition)} size={34} strokeWidth={1.5} />
+          </span>
           <div>
             <span className="sidebar__temp">
               {w.temperature}<span className="sidebar__temp-unit">c</span>

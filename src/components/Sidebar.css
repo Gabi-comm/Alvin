@@ -109,7 +109,8 @@
 }
 
 .sidebar__weather-icon {
-  font-size: 30px;
+  display: inline-flex;
+  color: var(--alvin-accent-2);
 }
 
 .sidebar__temp {

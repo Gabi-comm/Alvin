@@ -61,12 +61,13 @@ export const DEVICES = [
 ]
 
 // Emergency scenarios ALVIN adapts to (from the concept table).
+// `icon` refers to an icon name in components/Icon.jsx.
 export const EMERGENCY_SCENARIOS = [
-  { id: 'fire', name: 'Fire', response: 'Safest evacuation exits', icon: '🔥' },
-  { id: 'earthquake', name: 'Earthquake', response: 'Safe waiting areas', icon: '🌐' },
-  { id: 'flood', name: 'Flood', response: 'Avoid flooded entrances', icon: '🌊' },
-  { id: 'rain', name: 'Heavy Rain', response: 'Covered walkways', icon: '🌧️' },
-  { id: 'heat', name: 'Extreme Heat', response: 'Cooling zones', icon: '☀️' },
+  { id: 'fire', name: 'Fire', response: 'Safest evacuation exits', icon: 'fire' },
+  { id: 'earthquake', name: 'Earthquake', response: 'Safe waiting areas', icon: 'quake' },
+  { id: 'flood', name: 'Flood', response: 'Avoid flooded entrances', icon: 'flood' },
+  { id: 'rain', name: 'Heavy Rain', response: 'Covered walkways', icon: 'cloud-rain' },
+  { id: 'heat', name: 'Extreme Heat', response: 'Cooling zones', icon: 'thermometer' },
 ]
 
 export const OUTDOOR_WEATHER = {

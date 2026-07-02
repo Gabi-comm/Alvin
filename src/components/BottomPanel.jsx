@@ -7,6 +7,7 @@ import {
   comfortColor,
 } from '../data/mockData'
 import { fetchRoute } from '../services/api'
+import Icon from './Icon'
 import './BottomPanel.css'
 
 function RecommendedCard() {
@@ -80,7 +81,7 @@ function EmergencyCard() {
       <span className="card__label">EMERGENCY STATUS</span>
       <div className="emergency__headline">
         <span className={`emergency__badge${e.active ? ' emergency__badge--active' : ''}`}>
-          {e.active ? '⚠' : '✓'}
+          <Icon name={e.active ? 'alert' : 'check'} size={20} />
         </span>
         <div>
           <span className="emergency__title">{e.headline}</span>

@@ -1,4 +1,5 @@
 import { BUILDINGS, FLOORS } from '../data/mockData'
+import Icon from './Icon'
 import './TopBar.css'
 
 const DATE_LABEL = 'May 16, 2025 10:15 AM'
@@ -26,9 +27,12 @@ export default function TopBar() {
       <div className="topbar__right">
         <span className="topbar__date">{DATE_LABEL}</span>
         <button className="topbar__icon-btn" aria-label="Notifications">
-          🔔<span className="topbar__badge">2</span>
+          <Icon name="bell" size={18} />
+          <span className="topbar__badge">2</span>
         </button>
-        <button className="topbar__avatar" aria-label="Account">👤</button>
+        <button className="topbar__avatar" aria-label="Account">
+          <Icon name="user" size={18} />
+        </button>
       </div>
     </header>
   )

@@ -1,4 +1,5 @@
 import { COMFORT_BANDS, comfortColor, airflowLabel, noiseLabel } from '../data/mockData'
+import Icon from './Icon'
 import './RoomPanel.css'
 
 function bandName(score) {
@@ -58,7 +59,9 @@ export default function RoomPanel({ room, onClose }) {
           <span className="room-panel__room">{room.room}</span>
         </div>
         {onClose && (
-          <button className="room-panel__close" onClick={onClose} aria-label="Close">×</button>
+          <button className="room-panel__close" onClick={onClose} aria-label="Close">
+            <Icon name="close" size={18} />
+          </button>
         )}
       </div>
 

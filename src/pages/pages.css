@@ -69,6 +69,13 @@
   font-weight: 600;
 }
 
+.info-card__name--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--alvin-text);
+}
+
 .score-pill {
   padding: 2px 10px;
   border-radius: 999px;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { COMFORT_BANDS } from '../data/mockData'
+import Icon from './Icon'
 import './MapView.css'
 
 // Bonifacio Global City, Taguig. MapLibre uses [lng, lat].
@@ -97,11 +98,13 @@ export default function MapView() {
             <span>{band.label}</span>
           </div>
         ))}
-        <span className="mapview__legend-loc">📍 BGC, Taguig</span>
+        <span className="mapview__legend-loc">
+          <Icon name="pin" size={13} /> BGC, Taguig
+        </span>
       </div>
 
       <div className="mapview__timeslider">
-        <span className="mapview__time-icon" aria-hidden="true">☀️</span>
+        <span className="mapview__time-icon" aria-hidden="true"><Icon name="sun" size={16} /></span>
         <span className="mapview__time-label">{label(0)}</span>
         <input
           type="range"
@@ -112,7 +115,7 @@ export default function MapView() {
           aria-label="Time of day"
         />
         <span className="mapview__time-label">{label(16)}</span>
-        <span className="mapview__time-icon" aria-hidden="true">🌙</span>
+        <span className="mapview__time-icon" aria-hidden="true"><Icon name="moon" size={16} /></span>
         <span className="mapview__time-current">{label(time)}</span>
       </div>
 
