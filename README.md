@@ -28,8 +28,8 @@ Instead of passive visualization, ALVIN acts as an active decision-support syste
 | :--- | :--- |
 | **Humidity Sensor** | DHT22 / DHT11 |
 | **Temperature Sensor** | DHT22, LM35 |
-| **Air Velocity Sensor** | MQT-2 *(Not included in current actual build)* |
-| **Connectivity** | ESP32 *(Alternative: Arduino Uno)* |
+| **Air Velocity Sensor** | MQT-2 |
+| **Connectivity** | ESP32 |
 
 ### Software & Cloud Infrastructure
 | Component | Technology |
