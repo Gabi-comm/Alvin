@@ -1,16 +1,53 @@
-# React + Vite
+# Malita Bois - Adaptive Living Virtual Intelligence Network (ALVIN)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> **Note:** This project was developed for **SparkFest 2026**.
 
-Currently, two official plugins are available:
+## Project Brief
+**ALVIN (Adaptive Living Virtual Intelligence Network)** is an innovative, human-centered 3D Digital Twin designed to address the critical need for real-time environmental awareness in public and private infrastructure. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Instead of passive visualization, ALVIN acts as an active decision-support system. By integrating IoT environmental sensing, GIS mapping, weather intelligence, and predictive analytics, ALVIN continuously evaluates indoor and outdoor conditions to recommend the safest, coolest, driest, and most comfortable places to stay. During emergencies (e.g., fires, floods, earthquakes), the system dynamically adapts to provide real-time, safe evacuation routes and assembly areas.
 
-## React Compiler
+## Core Features
+* **Interactive 3D Digital Twin:** Navigate floors, click rooms, view live environmental conditions, and visualize comfort zones.
+* **Smart Place Recommendation:** Computes an *Environmental Comfort Score* (based on temperature, humidity, airflow, and weather) to suggest the best places to study, wait, rest, or meet.
+* **Live Heat & Rain Map:** GIS visualization of outdoor heat indexes, rain intensity, cooling zones, and covered walkways.
+* **Dynamic Environmental Navigation:** Suggests shaded paths on sunny days, covered walkways during rain, and safest routes during disasters.
+* **Emergency Digital Twin:** Adapts in real-time to highlight inaccessible rooms, blocked entrances, nearest exits, and estimated evacuation times.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## Google Technologies Used
+* **Firebase:** Utilized for real-time data storage, retrieval, and seamless IoT-to-Cloud communication via REST API. 
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+---
+
+## Tech Stack & Architecture
+
+### Hardware Sensors & Main Parts
+| Component | Specification |
+| :--- | :--- |
+| **Humidity Sensor** | DHT22 / DHT11 |
+| **Temperature Sensor** | DHT22, LM35 |
+| **Air Velocity Sensor** | MQT-2 |
+| **Connectivity** | ESP32 |
+
+### Software & Cloud Infrastructure
+| Component | Technology |
+| :--- | :--- |
+| **Communication (IoT to Cloud)** | HTTP POST to Firebase REST API |
+| **Frontend** | React.js, Leaflet.js |
+| **Backend API** | Python |
+| **Database** | Firebase |
+| **Hosting** | Vercel |
+| **Pathfinding Engine** | NetworkX |
+| **Weather Integrations** | OpenWeatherMap |
+
+---
+
+## Team Name and Members
+**Team Name:** Malita Bois
+
+* **John Ray Cacananta**
+* **Alvin Dellomas**
+* **Gabriel John Solomon**
+* **Vince Anjo Villar**
