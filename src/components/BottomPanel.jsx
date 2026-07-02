@@ -1,9 +1,12 @@
+import { useEffect, useState } from 'react'
 import {
   RECOMMENDATIONS,
   BEST_ROUTE,
   EMERGENCY_STATUS,
+  NAV_DEFAULTS,
   comfortColor,
 } from '../data/mockData'
+import { fetchRoute } from '../services/api'
 import './BottomPanel.css'
 
 function RecommendedCard() {
@@ -32,14 +35,35 @@ function RecommendedCard() {
 }
 
 function BestRouteCard() {
+  const [route, setRoute] = useState(null) // live route, if the backend answers
+
+  useEffect(() => {
+    let active = true
+    fetchRoute(NAV_DEFAULTS.start, NAV_DEFAULTS.end, NAV_DEFAULTS.preference).then((data) => {
+      if (active && data && data.status === 'success') setRoute(data)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const live = Boolean(route)
+  const name = live ? route.detailed_path.at(-1)?.name ?? BEST_ROUTE.name : BEST_ROUTE.name
+  const via = live
+    ? `via ${route.detailed_path.map((n) => n.name).join(' → ')}`
+    : BEST_ROUTE.via
+  const detail = live ? `${route.total_steps} stops` : BEST_ROUTE.duration
+
   return (
     <article className="card">
-      <span className="card__label">BEST ROUTE ({BEST_ROUTE.mode})</span>
+      <span className="card__label">
+        BEST ROUTE ({BEST_ROUTE.mode}){live && <span className="live-dot"> ● LIVE</span>}
+      </span>
       <div className="route__body">
         <div className="route__info">
-          <span className="route__name">{BEST_ROUTE.name}</span>
-          <span className="route__via">{BEST_ROUTE.via}</span>
-          <span className="route__duration">{BEST_ROUTE.duration}</span>
+          <span className="route__name">{name}</span>
+          <span className="route__via">{via}</span>
+          <span className="route__duration">{detail}</span>
         </div>
         <div className="route__map" aria-hidden="true">
           <span className="route__map-line" />

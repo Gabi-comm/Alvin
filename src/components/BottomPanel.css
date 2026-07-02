@@ -27,6 +27,10 @@
   color: var(--alvin-text-dim);
 }
 
+.live-dot {
+  color: var(--alvin-accent);
+}
+
 /* Recommended */
 .reco__list {
   display: grid;

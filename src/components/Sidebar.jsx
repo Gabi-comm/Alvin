@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { OUTDOOR_WEATHER } from '../data/mockData'
+import { fetchWeather } from '../services/api'
 import './Sidebar.css'
 
 const NAV_ITEMS = [
@@ -12,7 +14,28 @@ const NAV_ITEMS = [
 ]
 
 export default function Sidebar() {
-  const w = OUTDOOR_WEATHER
+  const [w, setW] = useState(OUTDOOR_WEATHER)
+
+  useEffect(() => {
+    let active = true
+    fetchWeather().then((data) => {
+      // Backend provides temp/heat index/condition; humidity, wind and rain
+      // intensity aren't in that endpoint yet, so keep the mock values for those.
+      if (active && data && data.status === 'success') {
+        setW((prev) => ({
+          ...prev,
+          city: data.location ?? prev.city,
+          temperature: Math.round(data.temperature_c ?? prev.temperature),
+          heatIndex: `${Math.round(data.heat_index_c ?? 0)} C`,
+          condition: data.is_raining ? 'Rain detected' : data.condition ?? prev.condition,
+          source: 'Live · ALVIN backend',
+        }))
+      }
+    })
+    return () => {
+      active = false
+    }
+  }, [])
 
   return (
     <aside className="sidebar">

@@ -80,6 +80,14 @@ export const BEST_ROUTE = {
   duration: '4 min walk',
 }
 
+// Default start/end nodes for the live navigation query. Update these to real
+// Firestore node ids once the graph is populated (see /api/navigate).
+export const NAV_DEFAULTS = {
+  start: 'node_entrance',
+  end: 'node_library',
+  preference: 'covered', // 'shortest' | 'covered' | 'comfortable'
+}
+
 export const EMERGENCY_STATUS = {
   active: false,
   headline: 'No Active Emergency',
