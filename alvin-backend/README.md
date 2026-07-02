@@ -26,6 +26,15 @@ uvicorn main:app --reload --port 8000
 
 Interactive API docs: http://localhost:8000/docs
 
+## Seed sample data
+
+With the server running (and Firebase connected), populate a sample building
+graph so the navigation and dashboard endpoints return real data:
+
+```bash
+python seed.py
+```
+
 ## Endpoints
 
 | Method | Path | Purpose |
