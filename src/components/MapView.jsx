@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { useEmergency } from '../context/EmergencyContext'
 import { useRoute, routeColour } from '../context/RouteContext'
+import { USER_LOCATION } from '../data/mockData'
 import Icon from './Icon'
 import './MapView.css'
 
 // Seda BGC, Taguig. MapLibre uses [lng, lat].
-const BGC_CENTER = [121.0505, 14.5527]
+const BGC_CENTER = USER_LOCATION.coords
 const BGC_BOUNDS = [
   [121.034, 14.538], // south-west
   [121.063, 14.563], // north-east

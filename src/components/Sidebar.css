@@ -83,7 +83,7 @@
 }
 
 .sidebar__weather {
-  margin-top: 4px;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;

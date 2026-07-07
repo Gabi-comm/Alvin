@@ -8,7 +8,7 @@ export const SEDA_BGC = {
   name: 'Seda BGC',
   partner: 'Partner Safe Building',
   address: '30th St cor 11th Ave, BGC, Taguig',
-  coords: [121.0505, 14.5527], // [lng, lat]
+  coords: [121.05305119776797, 14.550777759931028], // [lng, lat]
 }
 
 // The building marker location on the map.

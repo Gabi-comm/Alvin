@@ -201,25 +201,102 @@
 }
 
 .stat-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 18px;
+  gap: 6px;
+  padding: 16px 18px;
   background: var(--alvin-surface);
   border: 1px solid var(--alvin-border);
   border-radius: 12px;
-  box-shadow: var(--alvin-shadow);
+}
+
+.stat-card__dot {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .stat-card__value {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.5px;
 }
 
 .stat-card__label {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   color: var(--alvin-text-dim);
+}
+
+/* Panel head with a title + hint */
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel__hint {
+  font-size: 11px;
+  color: var(--alvin-text-dim);
+}
+
+/* Flush table inside a panel */
+.table--flush th,
+.table--flush td {
+  padding: 10px 10px;
+}
+
+.table--flush tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-strong {
+  font-weight: 600;
+  color: var(--alvin-text);
+}
+
+.cell-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.cell-dim {
+  color: var(--alvin-text-dim);
+}
+
+.cell-comfort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cell-bar {
+  flex: 1;
+  max-width: 220px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--alvin-surface-2);
+  overflow: hidden;
+}
+
+.cell-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.cell-comfort__val {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 36px;
 }
 
 /* Bar chart */

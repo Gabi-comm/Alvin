@@ -32,8 +32,8 @@
 
 /* Bottom metrics — ~1/4 of the height. */
 .map-overview__bottom {
-  flex: 1;
-  min-height: 190px;
+  flex: 1.1;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -1,4 +1,4 @@
-import { comfortColor, HOURLY_TELEMETRY } from '../data/mockData'
+import { comfortColor, airflowLabel, HOURLY_TELEMETRY } from '../data/mockData'
 import { useRooms, useDevices } from '../hooks/useLiveData'
 import LineChart from '../components/LineChart'
 import './pages.css'
@@ -6,25 +6,24 @@ import './pages.css'
 const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0)
 
 export default function Analytics() {
-  const { rooms: ROOMS, live: roomsLive } = useRooms()
-  const { devices: DEVICES, live: devicesLive } = useDevices()
+  const { rooms, live: roomsLive } = useRooms()
+  const { devices, live: devicesLive } = useDevices()
 
-  const avgComfort = Math.round(avg(ROOMS.map((r) => r.score)))
-  const alerts = ROOMS.filter((r) => r.score < 70).length
-  const activeDevices = DEVICES.filter((d) => d.status === 'online').length
-  const totalCap = ROOMS.reduce((a, r) => a + r.capacity, 0)
-  const occupancy = totalCap
-    ? Math.round((ROOMS.reduce((a, r) => a + r.occupancy, 0) / totalCap) * 100)
-    : 0
+  const avgComfort = Math.round(avg(rooms.map((r) => r.score)))
+  const alerts = rooms.filter((r) => r.score < 70).length
+  const activeDevices = devices.filter((d) => d.status === 'online').length
+  const totalCap = rooms.reduce((a, r) => a + r.capacity, 0)
+  const totalOcc = rooms.reduce((a, r) => a + r.occupancy, 0)
+  const occupancy = totalCap ? Math.round((totalOcc / totalCap) * 100) : 0
 
   const stats = [
     { label: 'Avg. Comfort', value: `${avgComfort}%`, tone: comfortColor(avgComfort) },
     { label: 'Comfort Alerts', value: alerts, tone: alerts ? 'var(--alvin-warn)' : 'var(--alvin-accent)' },
-    { label: 'Active Devices', value: `${activeDevices}/${DEVICES.length}`, tone: 'var(--alvin-accent-2)' },
+    { label: 'Active Devices', value: `${activeDevices}/${devices.length}`, tone: 'var(--alvin-accent-2)' },
     { label: 'Occupancy', value: `${occupancy}%`, tone: 'var(--alvin-accent-2)' },
   ]
 
-  const ranked = [...ROOMS].sort((a, b) => b.score - a.score)
+  const ranked = [...rooms].sort((a, b) => b.score - a.score)
   const live = roomsLive || devicesLive
 
   return (
@@ -38,99 +37,90 @@ export default function Analytics() {
         </p>
       </div>
 
+      {/* KPIs */}
       <div className="stat-grid">
         {stats.map((s) => (
           <div key={s.label} className="stat-card">
-            <span className="stat-card__value" style={{ color: s.tone }}>{s.value}</span>
+            <span className="stat-card__dot" style={{ background: s.tone }} />
+            <span className="stat-card__value">{s.value}</span>
             <span className="stat-card__label">{s.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Hourly streams */}
+      {/* Trends */}
       <div className="grid grid--2" style={{ marginTop: 16 }}>
         <div className="panel">
-          <span className="panel__label">TEMPERATURE STREAM · HOURLY</span>
+          <div className="panel__head">
+            <span className="panel__label">Temperature</span>
+            <span className="panel__hint">°C · hourly</span>
+          </div>
           <LineChart data={HOURLY_TELEMETRY} valueKey="temp" unit="°" color="var(--alvin-warn)" />
         </div>
         <div className="panel">
-          <span className="panel__label">HUMIDITY STREAM · HOURLY</span>
+          <div className="panel__head">
+            <span className="panel__label">Humidity</span>
+            <span className="panel__hint">% · hourly</span>
+          </div>
           <LineChart data={HOURLY_TELEMETRY} valueKey="humidity" unit="%" color="var(--alvin-accent-2)" />
         </div>
       </div>
 
-      {/* Bar charts */}
-      <div className="grid grid--2" style={{ marginTop: 16 }}>
-        <div className="panel">
-          <span className="panel__label">COMFORT BY SPACE</span>
-          <div className="barchart">
-            {ranked.map((r) => (
-              <div key={r.id} className="barchart__row">
-                <span className="barchart__label">{r.name}</span>
-                <div className="barchart__track">
-                  <div className="barchart__fill" style={{ width: `${r.score}%`, background: comfortColor(r.score) }} />
-                </div>
-                <span className="barchart__value">{r.score}%</span>
-              </div>
-            ))}
-          </div>
+      {/* Spaces */}
+      <div className="panel" style={{ marginTop: 16 }}>
+        <div className="panel__head">
+          <span className="panel__label">Spaces</span>
+          <span className="panel__hint">{rooms.length} monitored</span>
         </div>
-
-        <div className="panel">
-          <span className="panel__label">OCCUPANCY BY SPACE</span>
-          <div className="barchart">
-            {ROOMS.map((r) => {
-              const pct = r.capacity ? Math.round((r.occupancy / r.capacity) * 100) : 0
-              return (
-                <div key={r.id} className="barchart__row">
-                  <span className="barchart__label">{r.name}</span>
-                  <div className="barchart__track">
-                    <div className="barchart__fill" style={{ width: `${pct}%`, background: 'var(--alvin-accent-2)' }} />
-                  </div>
-                  <span className="barchart__value">{r.occupancy}/{r.capacity}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Environmental readings */}
-      <h2 className="section-title">Environmental Monitoring</h2>
-      <div className="grid grid--rooms">
-        {ROOMS.map((room) => (
-          <div key={room.id} className="info-card">
-            <div className="info-card__head">
-              <span className="info-card__name">{room.name}</span>
-              <span className="score-pill" style={{ background: comfortColor(room.score) }}>
-                {room.score}%
-              </span>
-            </div>
-            <div className="metric-row"><span>Temperature</span><span>{room.temp ?? '—'}°C</span></div>
-            <div className="metric-row"><span>Humidity</span><span>{room.humidity ?? '—'}%</span></div>
-            <div className="metric-row"><span>Airflow</span><span>{room.airflow ?? '—'} m/s</span></div>
-            <div className="metric-row"><span>Occupancy</span><span>{room.occupancy} / {room.capacity}</span></div>
-          </div>
-        ))}
-      </div>
-
-      {/* Devices */}
-      <h2 className="section-title">IoT Devices</h2>
-      <div className="panel">
-        <table className="table">
+        <table className="table table--flush">
           <thead>
             <tr>
-              <th>Device ID</th><th>Location</th><th>Sensors</th><th>Battery</th><th>Last Seen</th><th>Status</th>
+              <th>Space</th><th style={{ width: '34%' }}>Comfort</th>
+              <th>Temp</th><th>Humidity</th><th>Airflow</th><th>Occupancy</th>
             </tr>
           </thead>
           <tbody>
-            {DEVICES.map((d) => (
+            {ranked.map((r) => (
+              <tr key={r.id}>
+                <td className="cell-strong">{r.name}</td>
+                <td>
+                  <div className="cell-comfort">
+                    <span className="cell-bar">
+                      <span className="cell-bar__fill" style={{ width: `${r.score}%`, background: comfortColor(r.score) }} />
+                    </span>
+                    <span className="cell-comfort__val" style={{ color: comfortColor(r.score) }}>{r.score}%</span>
+                  </div>
+                </td>
+                <td>{r.temp ?? '—'}°C</td>
+                <td>{r.humidity ?? '—'}%</td>
+                <td>{r.airflow != null ? airflowLabel(r.airflow) : '—'}</td>
+                <td>{r.occupancy}/{r.capacity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Devices */}
+      <div className="panel" style={{ marginTop: 16 }}>
+        <div className="panel__head">
+          <span className="panel__label">Devices</span>
+          <span className="panel__hint">{activeDevices}/{devices.length} online</span>
+        </div>
+        <table className="table table--flush">
+          <thead>
+            <tr>
+              <th>Device</th><th>Location</th><th>Sensors</th><th>Battery</th><th>Last Seen</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {devices.map((d) => (
               <tr key={d.id}>
-                <td style={{ fontFamily: 'monospace' }}>{d.id}</td>
+                <td className="cell-mono">{d.id}</td>
                 <td>{d.room}</td>
-                <td>{d.sensors.join(', ')}</td>
+                <td className="cell-dim">{d.sensors.join(', ')}</td>
                 <td>{d.battery}%</td>
-                <td>{d.lastSeen}</td>
+                <td className="cell-dim">{d.lastSeen}</td>
                 <td>
                   <span className={`status-tag status-tag--${d.status}`}>● {d.status}</span>
                 </td>
