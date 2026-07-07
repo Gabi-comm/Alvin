@@ -186,3 +186,16 @@ Drop `.glb` files into `public/models/`:
 - World Health Organization — Heat and Health
 - ASHRAE Standard 55 — Thermal Environmental Conditions for Human Occupancy
 - OpenWeatherMap, MapLibre, and OpenStreetMap / CARTO basemaps
+
+---
+
+## Credits
+
+> Developed for **SparkFest 2026**.
+
+**Team Name:** Malita Bois
+
+- John Ray Cacananta
+- Alvin Dellomas
+- Gabriel John Solomon
+- Vince Anjo Villar
