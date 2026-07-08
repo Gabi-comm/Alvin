@@ -31,8 +31,6 @@
 - **Cloud Firestore** — primary datastore for the map/routing graph (nodes and edges), room and sensor data, emergency state, and evacuation center records.
 - **Firebase Admin SDK** — backend integration layer (FastAPI) used to read/write Firestore and manage credentials/auth for backend services.
 
-*Note: ALVIN's mapping and 3D layers currently use MapLibre GL, OpenStreetMap/CARTO basemaps, three.js, and the OSRM routing API rather than Google Maps Platform — flagging this so the tech list stays accurate. Happy to update this section further if you plan to migrate any of these to Google Maps Platform, Vertex AI, or other Google Cloud services for the SparkFest submission.*
-
 ## SparkFest 2026
 
 This project was developed as part of **SparkFest 2026**, the flagship hackathon organized by the Google Developer Groups on Campus – Polytechnic University of the Philippines (GDG on Campus PUP).
