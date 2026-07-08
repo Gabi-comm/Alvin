@@ -6,6 +6,16 @@
   padding: 0 12px 12px;
 }
 
+.bottom-panel--duo {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Cards stretch to the tallest in the row; distribute their content so none
+   is left with a big empty gap. */
+.card {
+  min-width: 0;
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -37,6 +47,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+  flex: 1; /* fill the card height so it balances with the taller cards */
 }
 
 .reco__item {
@@ -48,6 +59,10 @@
   border-radius: 10px;
   background: var(--alvin-surface-2);
   border: 1px solid var(--alvin-border);
+}
+
+.reco__reason {
+  flex: 1; /* push the score chip to the bottom of the item */
 }
 
 .reco__item--featured {
@@ -75,7 +90,23 @@
   color: #04140f;
 }
 
-/* Best route */
+/* Best route — full-bleed 2D map widget */
+.card--route {
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.route__badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(10, 17, 32, 0.55);
+}
+
 .route__body {
   display: flex;
   gap: 12px;
@@ -132,13 +163,57 @@
    Stacked below the route info text; fills the full card width.
    flex: 1 lets it grow to consume remaining card height. */
 .route__minimap {
-  width: 100%;
-  min-height: 120px;
-  flex: 1;
-  border-radius: 8px;
+  position: absolute;
+  inset: 0;
+}
+
+.route__minimap-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* Overlay chrome floating over the full-bleed map */
+.route__minimap-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px 22px;
+  background: linear-gradient(to bottom, rgba(10, 17, 32, 0.9), rgba(10, 17, 32, 0));
+  pointer-events: none;
+}
+
+.route__minimap-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.route__minimap-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--on-map-dim);
+}
+
+.route__minimap-dest {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--on-map);
+}
+
+.route__minimap-addr {
+  font-size: 11px;
+  color: var(--on-map-dim);
+  white-space: nowrap;
   overflow: hidden;
-  border: 1px solid var(--alvin-border);
-  position: relative;
+  text-overflow: ellipsis;
 }
 
 /* Distance/duration overlay at the bottom of the mini map. */
@@ -260,6 +335,7 @@
 
 .emergency__rows {
   margin: 0;
+  margin-top: auto; /* anchor the detail rows to the bottom of the card */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -282,9 +358,28 @@
   color: var(--alvin-accent-2);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1280px) {
+  .bottom-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+  /* Emergency card spans the full width so there is no orphaned empty cell. */
+  .bottom-panel > .card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
   .bottom-panel {
     grid-template-columns: 1fr;
+  }
+  .bottom-panel > .card:last-child {
+    grid-column: auto;
+  }
+  .nav-selector {
+    flex-wrap: wrap;
+  }
+  .nav-selector__pills {
+    flex-wrap: wrap;
   }
 }
 
@@ -335,7 +430,7 @@
 
 .nav-selector__pill:hover {
   color: var(--alvin-text);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--alvin-surface);
 }
 
 .nav-selector__pill--active {

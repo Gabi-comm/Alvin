@@ -38,4 +38,23 @@ export const fetchDashboardStats = () => get('/api/dashboard/stats')
 export const fetchRoute = (start, end, preference = 'shortest', weather = 'Cloudy') =>
   get(`/api/navigate?start_node=${encodeURIComponent(start)}&end_node=${encodeURIComponent(end)}&preference=${preference}&weather=${encodeURIComponent(weather)}`)
 
+// GET /api/rooms -> full room detail (temp, humidity, airflow, noise, occupancy)
+export const fetchRooms = () => get('/api/rooms')
+
+// GET /api/recommendations -> best space per activity + ranked list
+export const fetchRecommendations = () => get('/api/recommendations')
+
+// GET /api/devices -> IoT sensor nodes + health summary
+export const fetchDevices = () => get('/api/devices')
+
+// GET /api/emergency/status -> global emergency state + safe-route guidance
+export const fetchEmergencyStatus = () => get('/api/emergency/status')
+
+// GET /api/evacuation-centers -> partner evacuation centers
+export const fetchEvacuationCenters = () => get('/api/evacuation-centers')
+
+// GET /api/evacuation-centers/nearest?lat=&lng= -> closest center to a point
+export const fetchNearestEvac = (lat, lng) =>
+  get(`/api/evacuation-centers/nearest?lat=${lat}&lng=${lng}`)
+
 export { BASE_URL }

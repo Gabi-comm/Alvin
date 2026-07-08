@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { useEmergency } from '../context/EmergencyContext'
 import { useRoute, routeColour } from '../context/RouteContext'
+import { USER_LOCATION } from '../data/mockData'
 import Icon from './Icon'
 import './MapView.css'
 
-// Bonifacio Global City, Taguig. MapLibre uses [lng, lat].
-const BGC_CENTER = [121.0489, 14.5509]
+// Seda BGC, Taguig. MapLibre uses [lng, lat].
+const BGC_CENTER = USER_LOCATION.coords
 const BGC_BOUNDS = [
   [121.034, 14.538], // south-west
   [121.063, 14.563], // north-east
@@ -40,6 +41,25 @@ function addBuildings(map) {
     },
     firstSymbol,
   )
+}
+
+// Generate a simulated heat field of weighted points around a center, so the
+// heatmap layer has a distribution to render (hotter toward the middle).
+function makeHeatPoints([lng, lat], n = 60, spread = 0.004) {
+  const features = []
+  for (let i = 0; i < n; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const r = Math.sqrt(Math.random()) * spread
+    const dLng = (Math.cos(angle) * r) / Math.cos((lat * Math.PI) / 180)
+    const dLat = Math.sin(angle) * r
+    const mag = Math.max(0, 1 - r / spread) * (0.4 + Math.random() * 0.6)
+    features.push({
+      type: 'Feature',
+      properties: { mag },
+      geometry: { type: 'Point', coordinates: [lng + dLng, lat + dLat] },
+    })
+  }
+  return { type: 'FeatureCollection', features }
 }
 
 // Great-circle distance in metres (fallback when routing is unavailable).
@@ -79,10 +99,13 @@ export default function MapView({ onBuildingClick }) {
   const clickRef = useRef(onBuildingClick)
   clickRef.current = onBuildingClick
   const evacMarkerRef = useRef(null)
+  const heatRafRef = useRef(0)
   const { active, origin, evac } = useEmergency()
   const { routePath, navigationPreference } = useRoute()
   const [now, setNow] = useState(() => new Date())
   const [routeInfo, setRouteInfo] = useState(null)
+  const [target, setTarget] = useState(evac) // resolved evacuation destination
+  const [heatmap, setHeatmap] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000)
@@ -108,7 +131,7 @@ export default function MapView({ onBuildingClick }) {
     el.className = 'building-marker'
     el.type = 'button'
     el.innerHTML = `
-      <span class="building-marker__label">Main Building</span>
+      <span class="building-marker__label">Seda BGC</span>
       <span class="building-marker__pin">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 8h2a2 2 0 0 1 2 2v11"/><path d="M2 21h20M8 7h.01M12 7h.01M8 11h.01M12 11h.01M8 15h.01M12 15h.01"/>
@@ -246,7 +269,11 @@ export default function MapView({ onBuildingClick }) {
 
     let cancelled = false
     const draw = async () => {
-      const { geometry, distance, duration } = await getRoute(origin.coords, evac.coords)
+      // Route to Seda BGC (the partner safe building) from the device location.
+      const dest = evac
+      setTarget(dest)
+
+      const { geometry, distance, duration } = await getRoute(origin.coords, dest.coords)
       if (cancelled || !mapRef.current) return
       const data = { type: 'Feature', geometry }
 
@@ -274,14 +301,14 @@ export default function MapView({ onBuildingClick }) {
       const el = document.createElement('div')
       el.className = 'evac-marker'
       el.innerHTML = `
-        <span class="evac-marker__label">${evac.name}</span>
+        <span class="evac-marker__label">${dest.name}</span>
         <span class="evac-marker__pin">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>
           </svg>
         </span>`
       evacMarkerRef.current = new maplibregl.Marker({ element: el, anchor: 'bottom' })
-        .setLngLat(evac.coords)
+        .setLngLat(dest.coords)
         .addTo(map)
 
       // Frame the whole route.
@@ -303,6 +330,98 @@ export default function MapView({ onBuildingClick }) {
     }
   }, [active, origin, evac])
 
+  // Simulated 2D heatmap + expanding "wave" ring, toggled by the button.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    const remove = () => {
+      cancelAnimationFrame(heatRafRef.current)
+      for (const id of ['heat-wave-ring', 'heat-layer']) {
+        if (map.getLayer(id)) map.removeLayer(id)
+      }
+      for (const s of ['heat-ring-src', 'heat-src']) {
+        if (map.getSource(s)) map.removeSource(s)
+      }
+    }
+
+    const add = () => {
+      if (map.getLayer('heat-layer')) return
+      const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
+
+      map.addSource('heat-src', { type: 'geojson', data: makeHeatPoints(BGC_CENTER) })
+      map.addLayer(
+        {
+          id: 'heat-layer',
+          type: 'heatmap',
+          source: 'heat-src',
+          paint: {
+            'heatmap-weight': ['interpolate', ['linear'], ['get', 'mag'], 0, 0, 1, 1],
+            'heatmap-intensity': 1,
+            'heatmap-radius': 30,
+            'heatmap-opacity': 0.75,
+            'heatmap-color': [
+              'interpolate', ['linear'], ['heatmap-density'],
+              0, 'rgba(0,0,0,0)',
+              0.2, '#2dd4bf',
+              0.4, '#22c55e',
+              0.6, '#fbbf24',
+              0.8, '#fb923c',
+              1, '#ef4444',
+            ],
+          },
+        },
+        firstSymbol,
+      )
+
+      map.addSource('heat-ring-src', {
+        type: 'geojson',
+        data: { type: 'Feature', geometry: { type: 'Point', coordinates: BGC_CENTER } },
+      })
+      map.addLayer(
+        {
+          id: 'heat-wave-ring',
+          type: 'circle',
+          source: 'heat-ring-src',
+          paint: {
+            'circle-radius': 0,
+            'circle-color': 'rgba(239,68,68,0.12)',
+            'circle-stroke-color': '#ef4444',
+            'circle-stroke-width': 2,
+            'circle-stroke-opacity': 0.6,
+          },
+        },
+        firstSymbol,
+      )
+
+      const t0 = performance.now()
+      const animate = (t) => {
+        if (!map.getLayer('heat-layer')) return
+        const s = (t - t0) / 1000
+        const pulse = 0.5 + 0.5 * Math.sin(s * 1.6)
+        map.setPaintProperty('heat-layer', 'heatmap-radius', 26 + pulse * 24)
+        map.setPaintProperty('heat-layer', 'heatmap-intensity', 0.7 + pulse * 0.7)
+        const ring = (s % 3) / 3
+        map.setPaintProperty('heat-wave-ring', 'circle-radius', ring * 100)
+        map.setPaintProperty('heat-wave-ring', 'circle-stroke-opacity', 0.7 * (1 - ring))
+        heatRafRef.current = requestAnimationFrame(animate)
+      }
+      heatRafRef.current = requestAnimationFrame(animate)
+    }
+
+    if (heatmap) {
+      if (map.isStyleLoaded()) add()
+      else map.once('load', add)
+    } else if (map.isStyleLoaded()) {
+      remove()
+    }
+
+    return () => {
+      cancelAnimationFrame(heatRafRef.current)
+      if (map.isStyleLoaded()) remove()
+    }
+  }, [heatmap])
+
   const resetView = () => mapRef.current?.easeTo({ ...INITIAL_VIEW, duration: 800 })
 
   const hour = now.getHours()
@@ -310,7 +429,7 @@ export default function MapView({ onBuildingClick }) {
   const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
   const dateStr = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
 
-  const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${origin.coords[1]},${origin.coords[0]}&destination=${evac.coords[1]},${evac.coords[0]}&travelmode=walking`
+  const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${origin.coords[1]},${origin.coords[0]}&destination=${target.coords[1]},${target.coords[0]}&travelmode=walking`
 
   return (
     <section className="mapview">
@@ -332,8 +451,8 @@ export default function MapView({ onBuildingClick }) {
             <Icon name="alert" size={18} />
             Emergency — proceed to evacuation
           </div>
-          <div className="mapview__evac-name">{evac.name}</div>
-          <div className="mapview__evac-sub">{evac.partner} · {evac.address}</div>
+          <div className="mapview__evac-name">{target.name}</div>
+          <div className="mapview__evac-sub">{target.partner} · {target.address}</div>
           {routeInfo && (
             <div className="mapview__evac-meta">
               {(routeInfo.distance / 1000).toFixed(2)} km · ~{Math.round(routeInfo.duration / 60)} min walk
@@ -345,9 +464,17 @@ export default function MapView({ onBuildingClick }) {
         </div>
       )}
 
-      <button className="mapview__reset" onClick={resetView}>
-        Reset view
-      </button>
+      <div className="mapview__tools">
+        <button
+          className={`mapview__tool${heatmap ? ' mapview__tool--on' : ''}`}
+          onClick={() => setHeatmap((v) => !v)}
+        >
+          <Icon name="heatmap" size={15} /> Heatmap
+        </button>
+        <button className="mapview__tool" onClick={resetView}>
+          Reset view
+        </button>
+      </div>
     </section>
   )
 }
