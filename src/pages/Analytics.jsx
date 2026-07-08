@@ -1,13 +1,33 @@
-import { comfortColor, airflowLabel, HOURLY_TELEMETRY } from '../data/mockData'
+import { useEffect, useRef, useState } from 'react'
+import { comfortColor, airflowLabel } from '../data/mockData'
 import { useRooms, useDevices } from '../hooks/useLiveData'
 import LineChart from '../components/LineChart'
 import './pages.css'
 
 const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0)
+const MAX_POINTS = 12
 
 export default function Analytics() {
   const { rooms, live: roomsLive } = useRooms()
   const { devices, live: devicesLive } = useDevices()
+
+  // Build a live temperature/humidity stream from the monitored room by
+  // snapshotting the latest reading every few seconds.
+  const room = rooms[0]
+  const roomRef = useRef(room)
+  roomRef.current = room
+  const [history, setHistory] = useState([])
+  useEffect(() => {
+    const snap = () => {
+      const r = roomRef.current
+      if (!r || r.temp == null) return
+      const label = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      setHistory((h) => [...h.slice(-(MAX_POINTS - 1)), { hour: label, temp: r.temp, humidity: r.humidity }])
+    }
+    snap()
+    const id = setInterval(snap, 5000)
+    return () => clearInterval(id)
+  }, [])
 
   const avgComfort = Math.round(avg(rooms.map((r) => r.score)))
   const alerts = rooms.filter((r) => r.score < 70).length
@@ -48,21 +68,29 @@ export default function Analytics() {
         ))}
       </div>
 
-      {/* Trends */}
+      {/* Live trends */}
       <div className="grid grid--2" style={{ marginTop: 16 }}>
         <div className="panel">
           <div className="panel__head">
             <span className="panel__label">Temperature</span>
-            <span className="panel__hint">°C · hourly</span>
+            <span className="panel__hint">°C · live stream</span>
           </div>
-          <LineChart data={HOURLY_TELEMETRY} valueKey="temp" unit="°" color="var(--alvin-warn)" />
+          {history.length > 1 ? (
+            <LineChart data={history} valueKey="temp" unit="°" color="var(--alvin-warn)" />
+          ) : (
+            <div className="chart-empty">Collecting live readings…</div>
+          )}
         </div>
         <div className="panel">
           <div className="panel__head">
             <span className="panel__label">Humidity</span>
-            <span className="panel__hint">% · hourly</span>
+            <span className="panel__hint">% · live stream</span>
           </div>
-          <LineChart data={HOURLY_TELEMETRY} valueKey="humidity" unit="%" color="var(--alvin-accent-2)" />
+          {history.length > 1 ? (
+            <LineChart data={history} valueKey="humidity" unit="%" color="var(--alvin-accent-2)" />
+          ) : (
+            <div className="chart-empty">Collecting live readings…</div>
+          )}
         </div>
       </div>
 

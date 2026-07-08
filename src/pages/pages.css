@@ -248,6 +248,14 @@
   color: var(--alvin-text-dim);
 }
 
+.chart-empty {
+  display: grid;
+  place-items: center;
+  height: 150px;
+  font-size: 13px;
+  color: var(--alvin-text-dim);
+}
+
 /* Flush table inside a panel */
 .table--flush th,
 .table--flush td {

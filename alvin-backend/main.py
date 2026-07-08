@@ -99,37 +99,25 @@ class InMemoryDB:
         return _MemCollection(self._data, cid)
 
 
+# The single hardware-connected room. Its node id must match the ESP32
+# firmware (config.h NODE_ID) and the frontend (HARDWARE_NODE_ID).
+HARDWARE_NODE_ID = os.getenv("ALVIN_HARDWARE_NODE_ID", "node_r610")
+
+
 def seed_memory(store):
-    """Seed the in-memory DB with the Seda BGC building so the web app has
-    data to show even before any sensor connects. Node ids match the firmware."""
-    rooms = [
-        ("node_r610", "Room 610", "Premier Suite · 6F", "610", 95, 24.3, 52, 0.6, 30, 2, 2),
-        ("node_r501", "Room 501", "Deluxe Room · 5F", "501", 92, 24.1, 54, 0.5, 32, 2, 2),
-        ("node_r803", "Room 803", "Corner Suite · 8F", "803", 82, 25.2, 55, 0.5, 34, 1, 3),
-        ("node_r712", "Room 712", "Deluxe Room · 7F", "712", 75, 25.8, 60, 0.4, 38, 2, 2),
-        ("node_r502", "Room 502", "Deluxe Room · 5F", "502", 70, 26.9, 58, 0.3, 40, 0, 2),
-        ("node_pool", "Pool Deck", "Amenities · 5F", "PD", 64, 27.8, 63, 0.4, 55, 12, 40),
-        ("node_restaurant", "Straight Up", "Dining · 11F", "11F", 58, 28.6, 66, 0.7, 60, 34, 90),
-        ("node_function", "Function Room", "Events · 2F", "2F", 50, 29.7, 68, 0.8, 52, 40, 120),
-        ("node_lobby", "Lobby", "Ground Floor", "GF", 40, 31.1, 70, 0.2, 58, 25, 80),
-    ]
-    for nid, name, wing, room_no, score, temp, hum, air, noise, occ, cap in rooms:
-        store.collection("nodes").document(nid).set({
-            "id": nid, "name": name, "floor": 1, "x": 0.0, "y": 0.0, "type": "room",
-            "comfort_score": score, "wing": wing, "room_no": room_no,
-            "temperature": temp, "humidity": hum, "airflow": air, "noise": noise,
-            "occupancy": occ, "capacity": cap,
-        })
-    devices = [
-        ("esp32-01", "Room 610", ["Temp", "Humidity"], 100, "online", "just now"),
-        ("esp32-02", "Room 501", ["Temp", "Humidity"], 88, "online", "8s ago"),
-        ("esp32-03", "Room 712", ["Temp", "Humidity"], 74, "online", "12s ago"),
-    ]
-    for did, room, sensors, battery, status, last_seen in devices:
-        store.collection("devices").document(did).set({
-            "id": did, "room": room, "sensors": sensors,
-            "battery": battery, "status": status, "last_seen": last_seen,
-        })
+    """Seed the in-memory DB with the single monitored room so the web app has
+    something to show before the sensor connects. The DHT22 then overwrites the
+    temperature / humidity / comfort_score live."""
+    store.collection("nodes").document(HARDWARE_NODE_ID).set({
+        "id": HARDWARE_NODE_ID, "name": "Room 610", "floor": 1, "x": 0.0, "y": 0.0,
+        "type": "room", "comfort_score": 95, "wing": "Premier Suite · 6F",
+        "room_no": "610", "temperature": 24.3, "humidity": 52, "airflow": 0.6,
+        "noise": 30, "occupancy": 2, "capacity": 2,
+    })
+    store.collection("devices").document("esp32-01").set({
+        "id": "esp32-01", "room": "Room 610", "sensors": ["Temp", "Humidity"],
+        "battery": 100, "status": "online", "last_seen": "just now",
+    })
 
 
 # Initialize the datastore: Firestore if credentials exist, else in-memory.
