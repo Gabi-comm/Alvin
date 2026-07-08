@@ -2,35 +2,52 @@
 
 ### Adaptive Living Virtual Intelligence Network
 
-A human-centered 3D digital twin for smart environmental navigation, comfort, and
-safety. ALVIN fuses IoT sensing, GIS mapping, weather intelligence, and 3D
-visualization to answer a single question for the people inside a building:
+## Team Information
 
-> Where should I be right now — and where do I go if something goes wrong?
+**Team Name:** Malita Bois
+**Project Name:** ALVIN — Adaptive Living Virtual Intelligence Network
 
-Instead of treating a digital twin as a passive dashboard, ALVIN turns it into an
-active decision-support layer: it scores the comfort of every space in real time,
-recommends the best place for what you are doing, and — in an emergency — routes
-you to the nearest partner evacuation center by GPS.
+## Project Brief
+
+**The problem:** Buildings today are static spaces — occupants have no real-time way of knowing which areas are comfortable to work or wait in, and in an emergency, no way of knowing the fastest safe route out or the nearest place to go for help. Facility managers, in turn, have no unified view of environmental conditions or device health across a building.
+
+**Our solution:** ALVIN is a human-centered 3D digital twin that fuses IoT sensing, GIS mapping, weather intelligence, and 3D visualization into one decision-support layer. It scores the comfort of every space in real time using temperature, humidity, airflow, and noise data, recommends the best space for a given activity (study, wait, rest, meet), and — in an emergency — routes occupants by GPS to the nearest partner evacuation center with turn-by-turn navigation. The whole experience is built around a real 3D model of the building rather than a flat dashboard, so people can see and interact with the actual space they're in.
+
+**Intended users/beneficiaries:** Building occupants (students, staff, visitors) who need to find comfortable or safe spaces day-to-day and during emergencies; facility managers and building administrators who need live visibility into environmental conditions, occupancy, and IoT sensor/device health.
+
+**Impact:** ALVIN turns passive building infrastructure into an active safety and comfort system — reducing time-to-safety during emergencies, improving day-to-day comfort and space utilization, and giving administrators real-time, data-driven visibility into their building's environmental health.
+
+## Team Members
+
+| Name | Role |
+|---|---|
+| Vince Anjo R. Villar | Project Lead |
+| Alvin P. Dellomas | Frontend |
+| John Ray P. Cacananta | Backend |
+| Gabriel John U. Solomon | Backend |
+
+## Google Technologies Used
+
+- **Cloud Firestore** — primary datastore for the map/routing graph (nodes and edges), room and sensor data, emergency state, and evacuation center records.
+- **Firebase Admin SDK** — backend integration layer (FastAPI) used to read/write Firestore and manage credentials/auth for backend services.
+
+*Note: ALVIN's mapping and 3D layers currently use MapLibre GL, OpenStreetMap/CARTO basemaps, three.js, and the OSRM routing API rather than Google Maps Platform — flagging this so the tech list stays accurate. Happy to update this section further if you plan to migrate any of these to Google Maps Platform, Vertex AI, or other Google Cloud services for the SparkFest submission.*
+
+## SparkFest 2026
+
+This project was developed as part of **SparkFest 2026**, the flagship hackathon organized by the Google Developer Groups on Campus – Polytechnic University of the Philippines (GDG on Campus PUP).
 
 ---
 
 ## Highlights
 
-- **3D city map, locked to BGC (Taguig).** A dark MapLibre GL basemap with real
-  3D building extrusions, a live clock, and a clickable "Main Building" marker.
-- **Interactive 3D digital twin.** The building (and per-room) `.glb` models render
-  with orbit controls via three.js / react-three-fiber.
-- **Live comfort scoring.** Every space carries a 0–100 comfort score derived from
-  temperature, humidity, airflow, and noise, shown as color-coded gauges.
-- **Smart recommendations.** Best place to study, wait, rest, or meet — ranked by
-  current conditions.
-- **Emergency evacuation routing.** One button draws a walking GPS route from the
-  building to a partner evacuation center and hands off to turn-by-turn navigation.
-- **Analytics and device health.** Building-wide trends, occupancy, and ESP32
-  sensor-node status at a glance.
-- **Fails soft.** The UI runs fully on mock data when the backend is offline, so the
-  experience never breaks during development or demos.
+- **3D city map, locked to BGC (Taguig).** A dark MapLibre GL basemap with real 3D building extrusions, a live clock, and a clickable "Main Building" marker.
+- **Interactive 3D digital twin.** The building (and per-room) `.glb` models render with orbit controls via three.js / react-three-fiber.
+- **Live comfort scoring.** Every space carries a 0–100 comfort score derived from temperature, humidity, airflow, and noise, shown as color-coded gauges.
+- **Smart recommendations.** Best place to study, wait, rest, or meet — ranked by current conditions.
+- **Emergency evacuation routing.** One button draws a walking GPS route from the building to a partner evacuation center and hands off to turn-by-turn navigation.
+- **Analytics and device health.** Building-wide trends, occupancy, and ESP32 sensor-node status at a glance.
+- **Fails soft.** The UI runs fully on mock data when the backend is offline, so the experience never breaks during development or demos.
 
 ---
 
@@ -52,9 +69,7 @@ IoT sensors (ESP32)        Weather APIs            3D models (.glb)
 ```
 
 - **Frontend** — this package. React + Vite single-page app.
-- **Backend** — `alvin-backend/`. FastAPI service for the map graph, routing,
-  sensor ingestion, weather, and emergency management. See its
-  [README](alvin-backend/README.md).
+- **Backend** — `alvin-backend/`. FastAPI service for the map graph, routing, sensor ingestion, weather, and emergency management. See its [README](alvin-backend/README.md).
 
 ---
 
@@ -80,8 +95,7 @@ cp .env.example .env        # optional: set VITE_API_URL
 npm run dev
 ```
 
-The app runs on `http://localhost:5173` (or `5174`). With no backend, it uses the
-mock data in `src/data/mockData.js`.
+The app runs on `http://localhost:5173` (or `5174`). With no backend, it uses the mock data in `src/data/mockData.js`.
 
 ### Backend
 
@@ -94,8 +108,7 @@ uvicorn main:app --reload --port 8000
 python seed.py               # optional: populate a sample building graph
 ```
 
-Without Firebase credentials the backend still boots in a degraded mode: weather
-works, and Firestore-backed endpoints return a clear 503.
+Without Firebase credentials the backend still boots in a degraded mode: weather works, and Firestore-backed endpoints return a clear 503.
 
 ---
 
@@ -104,13 +117,13 @@ works, and Firestore-backed endpoints return a clear 503.
 **Frontend** (`.env`)
 
 | Variable       | Default                 | Purpose                 |
-| -------------- | ----------------------- | ----------------------- |
+| -------------- | ------------------------ | ------------------------ |
 | `VITE_API_URL` | `http://localhost:8000` | Backend API base URL    |
 
 **Backend** (`alvin-backend/.env`)
 
 | Variable               | Purpose                                   |
-| ---------------------- | ----------------------------------------- |
+| ----------------------- | ------------------------------------------ |
 | `FIREBASE_CREDENTIALS` | Path to the Firebase service-account JSON |
 | `OPENWEATHER_API_KEY`  | OpenWeatherMap key for live weather       |
 | `ALVIN_CORS_ORIGINS`   | Comma-separated allowed frontend origins  |
@@ -139,18 +152,16 @@ alvin-backend/   FastAPI service + seed script
 
 Drop `.glb` files into `public/models/`:
 
-- `main-building.glb` — the whole building (shown on the 3D Twin page and the map
-  building panel).
+- `main-building.glb` — the whole building (shown on the 3D Twin page and the map building panel).
 - `Room.glb` — the generic room model.
-- Per-room models go in `public/models/rooms/` and are registered in
-  `src/config/models.js` under `ROOM_MODELS`, keyed by room id.
+- Per-room models go in `public/models/rooms/` and are registered in `src/config/models.js` under `ROOM_MODELS`, keyed by room id.
 
 ---
 
 ## Backend API
 
 | Method | Path                              | Purpose                              |
-| ------ | --------------------------------- | ------------------------------------ |
+| ------ | ---------------------------------- | ------------------------------------- |
 | GET    | `/`                               | Health + Firebase connection status  |
 | POST   | `/api/nodes`                      | Create/update a map node             |
 | POST   | `/api/edges`                      | Create/update a walkable path        |
@@ -186,16 +197,3 @@ Drop `.glb` files into `public/models/`:
 - World Health Organization — Heat and Health
 - ASHRAE Standard 55 — Thermal Environmental Conditions for Human Occupancy
 - OpenWeatherMap, MapLibre, and OpenStreetMap / CARTO basemaps
-
----
-
-## Credits
-
-> Developed for **SparkFest 2026**.
-
-**Team Name:** Malita Bois
-
-- John Ray Cacananta
-- Alvin Dellomas
-- Gabriel John Solomon
-- Vince Anjo Villar
