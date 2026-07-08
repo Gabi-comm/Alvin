@@ -1,44 +1,79 @@
 // -----------------------------------------------------------------------------
-// ALVIN Sensor Node — ESP32 + DHT22
+// ALVIN Sensor Node — ESP32 + DHT22  (with WiFi setup portal)
 //
-// Reads temperature & humidity (DHT22) and POSTs a reading to the ALVIN backend
-// `/api/sensors/ingest`, which recomputes the room's comfort score. On boot it
-// also registers itself via `/api/devices` so it shows up in the web app.
+// First boot: the ESP32 creates its own WiFi ("ALVIN-Setup"). Connect a phone
+// to it, a captive portal opens, and you enter your home WiFi + the ALVIN
+// backend URL. These are saved to flash, and the node joins your network. On
+// later boots it reconnects automatically — nothing is hardcoded.
 //
-// Libraries (install via Arduino Library Manager):
+// It reads temperature & humidity (DHT22) and POSTs to `/api/sensors/ingest`,
+// which recomputes the room's comfort score, and registers itself via
+// `/api/devices` so it appears in the web app.
+//
+// Libraries (Arduino Library Manager):
+//   - "WiFiManager" by tzapu
 //   - "DHT sensor library" by Adafruit  (+ "Adafruit Unified Sensor")
 //   - "ArduinoJson" by Benoit Blanchon (v6)
-// Board: any ESP32 dev board (e.g. "ESP32 Dev Module").
+// Board: any ESP32 dev board.
 // -----------------------------------------------------------------------------
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiManager.h>      // tzapu/WiFiManager
+#include <Preferences.h>
 #include <DHT.h>
 #include <ArduinoJson.h>
 #include "config.h"
 
 DHT dht(DHT_PIN, DHT_TYPE);
+Preferences prefs;
+String apiBase = ALVIN_API_URL_DEFAULT;   // resolved at setup from the portal
 unsigned long lastSend = 0;
 
 // ---------------------------------------------------------------------------
-// WiFi
+// WiFi provisioning (captive portal)
 // ---------------------------------------------------------------------------
-void connectWiFi() {
-  if (WiFi.status() == WL_CONNECTED) return;
-  Serial.printf("[wifi] connecting to %s", WIFI_SSID);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  unsigned long start = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
-    delay(400);
-    Serial.print(".");
+void setupWiFi() {
+  prefs.begin("alvin", false);
+
+  // Hold the BOOT button at power-on to wipe saved WiFi and re-open the portal.
+  pinMode(RESET_PIN, INPUT_PULLUP);
+  bool forcePortal = (digitalRead(RESET_PIN) == LOW);
+
+  apiBase = prefs.getString("api", ALVIN_API_URL_DEFAULT);
+
+  WiFiManager wm;
+  WiFiManagerParameter apiParam("api", "ALVIN backend URL", apiBase.c_str(), 80);
+  wm.addParameter(&apiParam);
+  wm.setConfigPortalTimeout(PORTAL_TIMEOUT_S);
+
+  if (forcePortal) {
+    Serial.println("[wifi] reset requested — clearing saved WiFi");
+    wm.resetSettings();
   }
-  Serial.println();
-  if (WiFi.status() == WL_CONNECTED) {
+
+  Serial.printf("[wifi] connecting (portal SSID: %s)...\n", AP_SSID);
+  // autoConnect() joins the saved network, or starts the portal if none/failed.
+  bool ok = wm.autoConnect(AP_SSID, AP_PASSWORD);
+
+  // Persist the backend URL entered in the portal.
+  apiBase = apiParam.getValue();
+  prefs.putString("api", apiBase);
+
+  if (ok) {
     Serial.print("[wifi] connected, IP: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("[wifi] FAILED — will retry");
+    Serial.println("[wifi] not connected (portal timed out) — will retry");
   }
+  Serial.printf("[cfg] backend: %s\n", apiBase.c_str());
+}
+
+void ensureWiFi() {
+  if (WiFi.status() == WL_CONNECTED) return;
+  Serial.println("[wifi] reconnecting...");
+  WiFi.reconnect();
+  unsigned long start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) delay(300);
 }
 
 // ---------------------------------------------------------------------------
@@ -47,7 +82,7 @@ void connectWiFi() {
 bool httpPostJson(const String& path, const String& body) {
   if (WiFi.status() != WL_CONNECTED) return false;
   HTTPClient http;
-  http.begin(String(ALVIN_API_URL) + path);
+  http.begin(apiBase + path);
   http.addHeader("Content-Type", "application/json");
   int code = http.POST(body);
   Serial.printf("[http] POST %s -> %d\n", path.c_str(), code);
@@ -56,7 +91,6 @@ bool httpPostJson(const String& path, const String& body) {
   return code >= 200 && code < 300;
 }
 
-// Register this node in the web app's device list.
 void registerDevice() {
   StaticJsonDocument<256> doc;
   doc["id"] = SENSOR_ID;
@@ -72,7 +106,6 @@ void registerDevice() {
   httpPostJson("/api/devices", body);
 }
 
-// Push a sensor reading; the backend recomputes the node's comfort score.
 void sendReading(float temp, float hum) {
   StaticJsonDocument<192> doc;
   doc["sensor_id"] = SENSOR_ID;
@@ -91,12 +124,12 @@ void setup() {
   Serial.begin(115200);
   delay(200);
   dht.begin();
-  connectWiFi();
+  setupWiFi();
   registerDevice();
 }
 
 void loop() {
-  connectWiFi();
+  ensureWiFi();
 
   if (millis() - lastSend >= SEND_INTERVAL_MS) {
     lastSend = millis();

@@ -30,18 +30,31 @@ score and updates the web app in real time.
 ## Firmware setup
 
 1. Install the Arduino **ESP32 board package**, and these libraries (Library Manager):
+   - **WiFiManager** by tzapu  (the setup portal)
    - **DHT sensor library** (Adafruit) + **Adafruit Unified Sensor**
    - **ArduinoJson** (v6)
+   - (`Preferences.h` ships with the ESP32 core — no install needed.)
 2. Open `alvin_sensor_node/alvin_sensor_node.ino` in the Arduino IDE.
-3. Edit `config.h`:
-   - `WIFI_SSID` / `WIFI_PASSWORD`
-   - `ALVIN_API_URL` — the **LAN IP** of the machine running the backend
-     (`http://<your-ip>:8000`), **not** `localhost`.
-   - `NODE_ID` — must match a node in the backend (default seed includes
-     `node_r610`), and `ROOM_NAME` for the device list.
+3. `config.h` no longer holds WiFi or the backend URL — those are entered in the
+   setup portal. You only set the node identity (`NODE_ID` must match the backend
+   `HARDWARE_NODE_ID`, default `node_r610`) and, optionally, `ALVIN_API_URL_DEFAULT`.
 4. Select your ESP32 board + port and **Upload**.
-5. Open Serial Monitor @ **115200 baud** — you should see readings and
+
+## First-time WiFi setup (captive portal)
+
+1. On first boot (or when no WiFi is saved) the ESP32 creates its own WiFi:
+   - SSID **`ALVIN-Setup`**, password **`alvinsetup`**.
+2. Connect your phone/laptop to that WiFi — a **captive portal** pops up
+   (or browse to `http://192.168.4.1`).
+3. Tap **Configure WiFi**, pick your home network, enter its password, and set
+   **ALVIN backend URL** to `http://<backend-lan-ip>:8000`. Save.
+4. The ESP32 stores this in flash and joins your network. On every later boot it
+   reconnects automatically — no re-entry needed.
+5. Open Serial Monitor @ **115200 baud** — you should see it connect and
    `POST /api/sensors/ingest -> 200`.
+
+> **Re-provision / change WiFi:** hold the **BOOT** button while powering on to
+> clear the saved WiFi and re-open the portal.
 
 ## End-to-end: see real data in the web app
 
@@ -56,18 +69,19 @@ whole pipeline works locally.
    uvicorn main:app --host 0.0.0.0 --port 8000
    ```
    The log should say `Datastore: IN-MEMORY ...`.
-2. **Find your computer's LAN IP** (e.g. `ipconfig getifaddr en0` on macOS) and
-   put `http://<that-ip>:8000` in `config.h` → `ALVIN_API_URL`.
+2. **Find your computer's LAN IP** (e.g. `ipconfig getifaddr en0` on macOS) —
+   you'll enter `http://<that-ip>:8000` in the ESP32 setup portal.
 3. **Start the frontend**:
    ```bash
    npm run dev
    ```
-   Set `VITE_API_URL` in the frontend `.env` to `http://localhost:8000` (default).
-4. **Power the ESP32.** Within a few seconds it registers itself and starts
-   posting readings.
+   `VITE_API_URL` defaults to `http://localhost:8000`.
+4. **Power the ESP32** and complete the setup portal (see above): join your WiFi
+   and enter the backend URL. It then registers itself and starts posting.
 5. Open the web app → **Analytics** (and the **Digital Twin** room status). The
-   room bound to `NODE_ID` now shows the **live DHT22 temperature/humidity**, the
-   comfort score recalculates, and the **● LIVE** badge appears.
+   room shows the **live DHT22 temperature/humidity**, the comfort score
+   recalculates, and the **● LIVE** badge appears — the page auto-refreshes
+   every few seconds, no reload needed.
 
 ### Quick test without hardware
 Post a reading by hand to confirm the pipeline:
