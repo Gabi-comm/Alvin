@@ -31,10 +31,6 @@
 - **Cloud Firestore** — primary datastore for the map/routing graph (nodes and edges), room and sensor data, emergency state, and evacuation center records.
 - **Firebase Admin SDK** — backend integration layer (FastAPI) used to read/write Firestore and manage credentials/auth for backend services.
 
-## SparkFest 2026
-
-This project was developed as part of **SparkFest 2026**, the flagship hackathon organized by the Google Developer Groups on Campus – Polytechnic University of the Philippines (GDG on Campus PUP).
-
 ---
 
 ## Highlights
@@ -80,6 +76,34 @@ IoT sensors (ESP32)        Weather APIs            3D models (.glb)
 | 3D models  | three.js, @react-three/fiber, @react-three/drei |
 | Routing    | OSRM public API (walking directions) with straight-line fallback |
 | Backend    | FastAPI, Firebase Admin (Firestore), networkx, OpenWeatherMap |
+| Blockchain | Polygon — on-chain audit trail for alerts, logs, and compliance records |
+
+---
+
+## Data storage: on-chain vs. off-chain
+
+ALVIN splits its data across two layers depending on whether the record needs to be tamper-evident and auditable, or fast and continuously updated.
+
+### On-chain (Polygon)
+
+Records that function as an audit trail — events that must be verifiable, timestamped, and resistant to after-the-fact tampering — are written to the **Polygon** blockchain:
+
+- Heat alert events
+- Emergency alerts
+- Sensor maintenance logs
+- Building inspection records
+- Environmental compliance reports
+
+### Off-chain (Firebase)
+
+Data that is high-frequency, large in volume, or purely operational, where speed and easy querying matter more than immutability:
+
+- Temperature
+- Humidity
+- Live dashboard
+- User interface
+- GIS
+- 3D models
 
 ---
 
